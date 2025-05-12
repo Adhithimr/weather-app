@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #74ebd5, #9face6);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .weather-app {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      width: 70%;
+      margin-right: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .weather-result {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+    }
+
+    .weather-result img {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="weather-app">
+    <h1>Weather App</h1>
+    <form id="locationForm">
+      <input type="text" id="locationInput" placeholder="Enter location..." required />
+      <br>
+      <br><button type="submit">Get Weather</button>
+    </form>
+    <div id="weatherResult" class="weather-result"></div>
+  </div>
+
+  <script>
+    document.getElementById("locationForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const location = document.getElementById("locationInput").value;
+      const apiKey = "f71f70d51db0415ab3a15815251205";
+      const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(location)}&aqi=yes`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("weatherResult").innerHTML = `<p>Error: ${data.error.message}</p>`;
+            return;
+          }
+
+          const { location, current } = data;
+          document.getElementById("weatherResult").innerHTML = `
+            <h2>${location.name}, ${location.country}</h2>
+            <p><strong>Temperature:</strong> ${current.temp_c}°C</p>
+            <p><strong>Condition:</strong> ${current.condition.text}</p>
+            <img src="https:${current.condition.icon}" alt="Weather Icon">
+            <p><strong>Humidity:</strong> ${current.humidity}%</p>
+            <p><strong>Wind:</strong> ${current.wind_kph} kph</p>
+          `;
+        })
+        .catch(err => {
+          document.getElementById("weatherResult").innerHTML = `<p>Failed to fetch weather data.</p>`;
+          console.error(err);
+        });
+    });
+  </script>
+</body>
+</html>
